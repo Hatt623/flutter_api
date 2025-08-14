@@ -18,6 +18,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
   late TextEditingController _nameController;
   late TextEditingController _locationController;
   late TextEditingController _descriptionController;
+  late TextEditingController _priceController;
   DateTime? _startDate;
   DateTime? _endDate;
   Uint8List? _imageBytes;
@@ -77,6 +78,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
 
     setState(() => _isLoading = true);
 
+    final price = int.tryParse(_priceController.text) ?? 0;
+
     final success = await EventService.updateEvent(
       widget.event.id!,
       _nameController.text,
@@ -84,6 +87,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
       DateFormat('yyyy-MM-dd').format(_endDate!),
       _locationController.text,
       _descriptionController.text,
+      price,
       _isImageChanged ? _imageBytes : null,
       _isImageChanged ? _imageName : null,
     );

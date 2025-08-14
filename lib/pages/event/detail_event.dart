@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_api/models/event_model.dart';
 import 'package:flutter_api/pages/event/edit_event.dart';
 import 'package:flutter_api/services/event_services.dart';
+import 'package:flutter_api/services/order_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math';
 import 'package:intl/intl.dart';
 
 class EventDetailScreen extends StatefulWidget {
@@ -16,6 +19,19 @@ class EventDetailScreen extends StatefulWidget {
 class _EventDetailScreenState extends State<EventDetailScreen> {
   bool _isLoading = false;
 
+  Future<int> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('user_id') ?? 0;
+  }
+
+  String generateOrderCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final rand = Random();
+    final randomPart =
+        List.generate(8, (index) => chars[rand.nextInt(chars.length)]).join();
+    return 'ORD-$randomPart';
+  }
+
   Future<void> _deleteEvent() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -29,7 +45,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            style:
+                ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             child: const Text("Hapus"),
           ),
         ],
@@ -49,6 +66,143 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
+  Future<void> _createOrder(BuildContext context) async {
+    final rootCtx = context;
+    bool isSubmitting = false;
+    final event = widget.event;
+
+    int quantity = 1;
+    double bayar = 0;
+
+    await showDialog(
+      context: rootCtx,
+      builder: (dialogCtx) {
+        return StatefulBuilder(
+          builder: (dialogCtx, setState) => AlertDialog(
+            title: const Text('Konfirmasi Order'),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Event: ${event.name}',
+                      style:
+                          const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                      'Tanggal: ${DateFormat('dd/MM/yyyy').format(event.startDate!)} - ${DateFormat('dd/MM/yyyy').format(event.endDate!)}'),
+                  Text('Lokasi: ${event.location ?? '-'}'),
+                  Text('Deskripsi: ${event.description ?? '-'}'),
+                  Text('Harga Satuan: Rp ${event.price ?? 0}'),
+                  const SizedBox(height: 16),
+
+                  // Input Quantity
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Quantity',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (val) {
+                      quantity = int.tryParse(val) ?? 1;
+                    },
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Input Bayar
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Jumlah Bayar',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (val) {
+                      bayar = double.tryParse(val) ?? 0;
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogCtx),
+                child: const Text('Batal'),
+              ),
+              ElevatedButton(
+                onPressed: isSubmitting
+                    ? null
+                    : () async {
+                        setState(() => isSubmitting = true);
+
+                        final hargaEvent = event.price ?? 0;
+                        final totalHarusBayar =
+                            hargaEvent * quantity;
+
+                        if (bayar != totalHarusBayar) {
+                          setState(() => isSubmitting = false);
+                          ScaffoldMessenger.of(rootCtx).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Jumlah bayar harus tepat: Rp$totalHarusBayar'),
+                              backgroundColor: Colors.redAccent,
+                            ),
+                          );
+                          return;
+                        }
+
+                        try {
+                          final userId = await getUserId();
+                          final code = generateOrderCode();
+
+                          await OrderService.createOrder(
+                            event.name ?? '',
+                            DateFormat('yyyy-MM-dd')
+                                .format(event.startDate!),
+                            DateFormat('yyyy-MM-dd')
+                                .format(event.endDate!),
+                            event.location ?? '',
+                            event.description ?? '',
+                            hargaEvent,
+                            userId,
+                            event.id!,
+                            code,
+                            quantity,
+                            'paid',
+                          );
+
+                          Navigator.of(dialogCtx).pop();
+
+                          ScaffoldMessenger.of(rootCtx).showSnackBar(
+                            const SnackBar(
+                              content: Text('Bayar sukses'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } catch (e) {
+                          Navigator.of(dialogCtx).pop();
+                          ScaffoldMessenger.of(rootCtx).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'Terjadi kesalahan saat membuat order'),
+                              backgroundColor: Colors.redAccent,
+                            ),
+                          );
+                        }
+                      },
+                child: isSubmitting
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2),
+                      )
+                    : const Text('Buat Order'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   String _formatDate(DateTime date) =>
       DateFormat('dd/MM/yyyy HH:mm').format(date);
 
@@ -62,12 +216,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             onPressed: _isLoading ? null : () => _deleteEvent(),
             icon: const Icon(Icons.delete),
           ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => _createOrder(context),
+          ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          if (widget.event.image != null && widget.event.image!.isNotEmpty)
+          if (widget.event.image != null &&
+              widget.event.image!.isNotEmpty)
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
@@ -81,7 +240,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
           Text(
             widget.event.name ?? 'Nama Event',
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
 
@@ -98,7 +258,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             children: [
               const Icon(Icons.calendar_today_outlined, size: 18),
               const SizedBox(width: 4),
-              Text('Mulai: ${_formatDate(widget.event.startDate!)}'),
+              Text(
+                  'Mulai: ${_formatDate(widget.event.startDate!)}'),
             ],
           ),
           const SizedBox(height: 4),
@@ -106,17 +267,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             children: [
               const Icon(Icons.calendar_today, size: 18),
               const SizedBox(width: 4),
-              Text('Selesai: ${_formatDate(widget.event.endDate!)}'),
+              Text(
+                  'Selesai: ${_formatDate(widget.event.endDate!)}'),
             ],
           ),
-          const SizedBox(height: 16),
-
-          // Chip(
-          //   label: Text(widget.event.status == 1 ? "Aktif" : "Tidak Aktif"),
-          //   backgroundColor: widget.event.status == 1
-          //       ? Colors.greenAccent
-          //       : Colors.grey.shade300,
-          // ),
           const SizedBox(height: 16),
 
           Text(
@@ -131,7 +285,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           final result = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => EditEventScreen(event: widget.event),
+              builder: (_) =>
+                  EditEventScreen(event: widget.event),
             ),
           );
 

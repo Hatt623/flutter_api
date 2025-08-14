@@ -5,22 +5,45 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   final String baseUrl = 'http://127.0.0.1:8000/api';
 
-  Future<bool> login({required String email, password}) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/login'),
-      body: {'email': email, 'password': password},
-      headers: {'Accept': 'application/json'},
+  Future<bool> login({required String email, required String password}) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/login'),
+    body: {'email': email, 'password': password},
+    headers: {'Accept': 'application/json'},
+  );
+
+  print(response.body);
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final token = data['access_token'];
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
+
+    final profileResponse = await http.get(
+      Uri.parse('$baseUrl/user'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
     );
-    print(response.body);
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', data['access_token']);
-      return true;
+
+    if (profileResponse.statusCode == 200) {
+      final profileData = jsonDecode(profileResponse.body);
+      final userId = profileData['id']; 
+
+      await prefs.setInt('user_id', userId);
+      print('User ID saved: $userId');
     } else {
-      return false;
+      print('Gagal mengambil profil user');
     }
+
+    return true;
+  } else {
+    return false;
   }
+}
 
   Future<bool> register(String name, email, password) async {
     final response = await http.post(

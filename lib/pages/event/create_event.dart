@@ -16,6 +16,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   final _nameController = TextEditingController();
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _priceController = TextEditingController();
 
   DateTime? _startDate;
   DateTime? _endDate;
@@ -72,12 +73,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
     setState(() => _isLoading = true);
 
+    final price = int.tryParse(_priceController.text) ?? 0;
+
     final success = await EventService.createEvent(
       _nameController.text,
       DateFormat('yyyy-MM-dd').format(_startDate!),
       DateFormat('yyyy-MM-dd').format(_endDate!),
       _locationController.text,
       _descriptionController.text,
+      price,
       _imageBytes,
       _imageName,
     );
@@ -122,6 +126,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 controller: _descriptionController,
                 decoration: const InputDecoration(labelText: 'Deskripsi'),
                 validator: (v) => v == null || v.isEmpty ? 'Deskripsi tidak boleh kosong' : null,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _priceController,
+                decoration: const InputDecoration(labelText: 'Harga Tiket'),
+                keyboardType: TextInputType.number,
+                validator: (v) => v == null || v.isEmpty ? 'Harga tidak boleh kosong' : null,
               ),
               const SizedBox(height: 12),
               Row(

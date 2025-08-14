@@ -56,6 +56,7 @@ class EventService {
     String endDate,
     String location,
     String description,
+    int price,
     [
       Uint8List? imageBytes,
       String? imageName,
@@ -69,6 +70,7 @@ class EventService {
       request.fields['end_date'] = endDate;
       request.fields['location'] = location;
       request.fields['description'] = description;
+      request.fields['price'] = price.toString();
 
     if (imageBytes != null && imageName != null) {
       request.files.add(
@@ -98,6 +100,7 @@ class EventService {
     String endDate,
     String location,
     String description,
+    int price,
     [
       Uint8List? imageBytes,
       String? imageName,
@@ -113,6 +116,7 @@ class EventService {
       request.fields['end_date'] = endDate;
       request.fields['location'] = location;
       request.fields['description'] = description;
+      request.fields['price'] = price.toString();
 
       if (imageBytes != null && imageName != null) {
         request.files.add(

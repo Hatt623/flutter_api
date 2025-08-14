@@ -1,9 +1,10 @@
 // import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_api/pages/home_screen.dart';
-import 'package:flutter_api/pages/posts/list_post_screen.dart';
+// import 'package:flutter_api/pages/home_screen.dart';
+// import 'package:flutter_api/pages/posts/list_post_screen.dart';
 import 'package:flutter_api/pages/event/list_event_screen.dart';
+import 'package:flutter_api/pages/order&event/list_order_screen.dart';
 import 'package:flutter_api/pages/profile_screen.dart';
 
 class MenuScreen extends StatefulWidget {
@@ -19,9 +20,10 @@ class _MenuScreenState extends State<MenuScreen> {
   // late Animation<double> = _scaleAnimation;
 
   final List<Widget> _pages = [
-    const HomeScreen(),
-    const ListPostScreen(),
+    // const HomeScreen(),
+    // const ListPostScreen(),
     const ListEventScreen(),
+    const ListOrderScreen(),
     const ProfileScreen(),
   ];
 
@@ -61,17 +63,21 @@ class _MenuScreenState extends State<MenuScreen> {
               fontWeight: FontWeight.normal,
             ),
             items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_rounded),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.article_outlined),
-                label: 'Posts',
-              ),
+              // BottomNavigationBarItem(
+              //   icon: Icon(Icons.home_rounded),
+              //   label: 'Home',
+              // ),
+              // BottomNavigationBarItem(
+              //   icon: Icon(Icons.article_outlined),
+              //   label: 'Posts',
+              // ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.music_note),
                 label: 'Events',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.airplane_ticket),
+                label: 'Order & Tickets',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person_outline),

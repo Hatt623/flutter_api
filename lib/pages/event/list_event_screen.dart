@@ -57,7 +57,7 @@ class _ListEventScreenState extends State<ListEventScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My event'),
+        title: const Text('Available Events'),
         actions: [
           IconButton(onPressed: _refreshEvent, icon: const Icon(Icons.refresh)),
           IconButton(

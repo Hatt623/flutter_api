@@ -1,27 +1,27 @@
 // To parse this JSON data, do
 //
-//     final eventModel = eventModelFromJson(jsonString);
+//     final tiketModel = tiketModelFromJson(jsonString);
 
 import 'dart:convert';
 
-EventModel eventModelFromJson(String str) => EventModel.fromJson(json.decode(str));
+TiketModel tiketModelFromJson(String str) => TiketModel.fromJson(json.decode(str));
 
-String eventModelToJson(EventModel data) => json.encode(data.toJson());
+String tiketModelToJson(TiketModel data) => json.encode(data.toJson());
 
-class EventModel {
+class TiketModel {
     bool? success;
-    List<DataEvent>? data;
+    List<DataTiket>? data;
     String? message;
 
-    EventModel({
+    TiketModel({
         this.success,
         this.data,
         this.message,
     });
 
-    factory EventModel.fromJson(Map<String, dynamic> json) => EventModel(
+    factory TiketModel.fromJson(Map<String, dynamic> json) => TiketModel(
         success: json["success"],
-        data: json["data"] == null ? [] : List<DataEvent>.from(json["data"]!.map((x) => DataEvent.fromJson(x))),
+        data: json["data"] == null ? [] : List<DataTiket>.from(json["data"]!.map((x) => DataTiket.fromJson(x))),
         message: json["message"],
     );
 
@@ -32,53 +32,57 @@ class EventModel {
     };
 }
 
-class DataEvent {
+class DataTiket {
     int? id;
-    String? image;
+    int? userId;
+    int? orderId;
+    int? eventId;
     String? name;
+    String? location;
+    String? code;
     DateTime? startDate;
     DateTime? endDate;
-    String? location;
-    String? description;
-    int? price;
     DateTime? createdAt;
     DateTime? updatedAt;
 
-    DataEvent({
+    DataTiket({
         this.id,
-        this.image,
+        this.userId,
+        this.orderId,
+        this.eventId,
         this.name,
+        this.location,
+        this.code,
         this.startDate,
         this.endDate,
-        this.location,
-        this.description,
-        this.price,
         this.createdAt,
         this.updatedAt,
     });
 
-    factory DataEvent.fromJson(Map<String, dynamic> json) => DataEvent(
+    factory DataTiket.fromJson(Map<String, dynamic> json) => DataTiket(
         id: json["id"],
-        image: json["image"],
+        userId: json["user_id"],
+        orderId: json["order_id"],
+        eventId: json["event_id"],
         name: json["name"],
+        location: json["location"],
+        code: json["code"],
         startDate: json["start_date"] == null ? null : DateTime.parse(json["start_date"]),
         endDate: json["end_date"] == null ? null : DateTime.parse(json["end_date"]),
-        location: json["location"],
-        description: json["description"],
-        price: json["price"],
         createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
         updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
     );
 
     Map<String, dynamic> toJson() => {
         "id": id,
-        "image": image,
+        "user_id": userId,
+        "order_id": orderId,
+        "event_id": eventId,
         "name": name,
+        "location": location,
+        "code": code,
         "start_date": startDate?.toIso8601String(),
         "end_date": endDate?.toIso8601String(),
-        "location": location,
-        "description": description,
-        "price": price,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
     };
