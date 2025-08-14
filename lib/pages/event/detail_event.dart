@@ -217,10 +217,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             icon: const Icon(Icons.delete),
           ),
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.local_activity),
+            color: const Color.fromARGB(255, 255, 64, 64), 
+            tooltip: 'Beli Tiket',
             onPressed: () => _createOrder(context),
-          ),
+          )
+
         ],
+        
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

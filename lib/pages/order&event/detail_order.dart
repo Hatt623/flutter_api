@@ -192,8 +192,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             icon: const Icon(Icons.confirmation_num),
             label: const Text("Lihat Tiket"),
             onPressed: () {
-              final tikets = widget.order.tikets ?? const <Tiket>[];
-              _showTicketDialog(tikets);
+              _showTicketDialog(widget.order.tikets);
             },
           ),
         ],
