@@ -98,7 +98,7 @@ class _ListOrderScreenState extends State<ListOrderScreen> {
                           },
                     leading: event?.image != null && (event!.image?.isNotEmpty ?? false)
                         ? Image.network(
-                            'http://127.0.0.1:8000/storage/${event.image!}', // sesuaikan host untuk emulator/device
+                            'http://127.0.0.1:8000/storage/${event.image!}',
                             width: 50,
                             height: 50,
                             fit: BoxFit.cover,

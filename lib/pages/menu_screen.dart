@@ -1,7 +1,7 @@
 // import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-// import 'package:flutter_api/pages/home_screen.dart';
+import 'package:flutter_api/pages/home_screen.dart';
 // import 'package:flutter_api/pages/posts/list_post_screen.dart';
 import 'package:flutter_api/pages/event/list_event_screen.dart';
 import 'package:flutter_api/pages/order&event/list_order_screen.dart';
@@ -20,7 +20,7 @@ class _MenuScreenState extends State<MenuScreen> {
   // late Animation<double> = _scaleAnimation;
 
   final List<Widget> _pages = [
-    // const HomeScreen(),
+    const HomeScreen(),
     // const ListPostScreen(),
     const ListEventScreen(),
     const ListOrderScreen(),
@@ -63,10 +63,10 @@ class _MenuScreenState extends State<MenuScreen> {
               fontWeight: FontWeight.normal,
             ),
             items: const [
-              // BottomNavigationBarItem(
-              //   icon: Icon(Icons.home_rounded),
-              //   label: 'Home',
-              // ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_rounded),
+                label: 'Home',
+              ),
               // BottomNavigationBarItem(
               //   icon: Icon(Icons.article_outlined),
               //   label: 'Posts',

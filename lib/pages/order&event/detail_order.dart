@@ -52,7 +52,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   String _formatDate(DateTime date) =>
       DateFormat('dd/MM/yyyy HH:mm').format(date);
 
-  // Use Tiket from order_model.dart
+  // Use Tiket dari order_model.dart
   void _showTicketDialog(List<Tiket> tikets) {
     showDialog(
       context: context,

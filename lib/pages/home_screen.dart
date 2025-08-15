@@ -10,10 +10,10 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.dashboard, size: 80, color: Colors.blue),
+            Icon(Icons.local_activity, size: 80, color: Colors.blue),
             SizedBox(height: 20),
             Text(
-              'Selamat Datang di Flutter',
+              'Selamat Datang di HTT Events',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),

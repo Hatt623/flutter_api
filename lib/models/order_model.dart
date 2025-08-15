@@ -9,11 +9,10 @@ class OrderModel {
     this.message,
   });
 
-  /// Getter bantu untuk cek sukses order
+  /// Getter 
   bool get isSuccessful => success || (data?.id != null);
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
-    // Normalisasi success jadi bool murni
     final rawSuccess = json['success'];
     final normalizedSuccess = rawSuccess == true ||
         rawSuccess == 1 ||
